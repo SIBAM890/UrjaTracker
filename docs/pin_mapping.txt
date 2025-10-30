@@ -1,0 +1,14 @@
+Pin mapping details 
+URJA-TRACKER: Arduino UNO Pin Mapping
+--------------------------------------
+FUNCTION     | COMPONENT        | PIN | TYPE
+--------------------------------------
+Sensor       | PIR Motion       | D2  | Digital In
+Sensor       | LDR Light        | A0  | Analog In
+Sensor       | DHT11 Temp/Hum   | D3  | Digital In
+Sensor       | ACS712 Current   | A1  | Analog In
+             |                  |     |
+Actuator     | Light Relay      | D4  | Digital Out
+Actuator     | Fan Relay        | D5  | Digital Out
+             |                  |     |
+Communication| Serial TX/RX     | D0,D1 | UART (USB)

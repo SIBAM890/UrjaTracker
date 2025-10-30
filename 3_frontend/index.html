@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDG 7: Affordable and Clean Energy in India</title>
+    <link rel="icon" href="ssu-logo.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc;
+        }
+        
+        /* SSU Brand Colors */
+        :root {
+            --color-brand-primary: #63182b; /* SSU Maroon */
+            --color-brand-primary-dark: #4a1220; /* Darker Maroon */
+            --color-brand-secondary: #d2a15f; /* SSU Gold */
+            --color-brand-accent: #f5eeda; /* SSU Cream */
+        }
+        
+        /* Splash Screen & Animation Styles */
+        #splash-screen {
+            position: fixed;
+            inset: 0; 
+            background-color: var(--color-brand-primary); 
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 0.5s ease-out; 
+        }
+        
+        #splash-screen img {
+            width: 220px; /* --- LOGO SIZE INCREASED HERE --- */
+            height: auto;
+            opacity: 0;
+            transform: scale(0.5);
+            animation: logo-pop 1.5s ease-out 0.5s forwards; 
+        }
+
+        @keyframes logo-pop {
+            0% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        #splash-screen.fade-out {
+            opacity: 0;
+            pointer-events: none; 
+        }
+        /* End Splash Screen Styles */
+
+        /* Style for scroll animations */
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s cubic-bezier(0.5, 0, 0, 1), transform 0.6s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        
+        /* Styles for falling leaves animation */
+        .leaves-container { position: relative; overflow: hidden; }
+        .leaf { position: absolute; width: 25px; height: 25px; background: rgba(210, 161, 95, 0.6); top: -50px; border-radius: 0 50% 0 50%; animation: fall 20s linear infinite; }
+        @keyframes fall { 0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 1; } 100% { transform: translateY(100vh) rotate(360deg) translateX(20px); opacity: 0; } }
+        .leaf:nth-child(1) { left: 10%; animation-duration: 25s; animation-delay: -5s; width: 20px; height: 20px; }
+        .leaf:nth-child(2) { left: 20%; animation-duration: 22s; animation-delay: -2s; width: 30px; height: 30px; }
+        .leaf:nth-child(3) { left: 30%; animation-duration: 28s; animation-delay: -10s; width: 15px; height: 15px; }
+        .leaf:nth-child(4) { left: 40%; animation-duration: 24s; animation-delay: -7s; background-color: rgba(99, 24, 43, 0.5); }
+        .leaf:nth-child(5) { left: 50%; animation-duration: 30s; animation-delay: 0s; width: 25px; height: 25px; }
+        .leaf:nth-child(6) { left: 60%; animation-duration: 23s; animation-delay: -4s; width: 18px; height: 18px; }
+        .leaf:nth-child(7) { left: 70%; animation-duration: 26s; animation-delay: -8s; background-color: rgba(210, 161, 95, 0.6); }
+        .leaf:nth-child(8) { left: 80%; animation-duration: 21s; animation-delay: -1s; width: 35px; height: 35px; }
+        .leaf:nth-child(9) { left: 85%; animation-duration: 29s; animation-delay: -12s; }
+        .leaf:nth-child(10) { left: 90%; animation-duration: 27s; animation-delay: -6s; width: 22px; height: 22px; }
+
+        /* Modal Styles */
+        .modal-backdrop { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .modal-backdrop.visible { opacity: 1; pointer-events: auto; }
+        .modal-content { background: white; padding: 1.5rem 2rem; border-radius: 1rem; max-width: 600px; width: 90%; transform: scale(0.95); transition: transform 0.3s ease; max-height: 90vh; overflow-y: auto; }
+        .modal-backdrop.visible .modal-content { transform: scale(1); }
+
+        /* Quiz Styles */
+        .answer-btn { display: block; width: 100%; padding: 0.75rem 1rem; margin-bottom: 0.5rem; text-align: left; font-weight: 500; color: #374151; background-color: #f9fafb; border: 2px solid #e5e7eb; border-radius: 0.75rem; transition: all 0.2s ease; }
+        .answer-btn:hover { background-color: var(--color-brand-accent); border-color: var(--color-brand-secondary); transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+        .progress-bar-container { width: 100%; height: 8px; background-color: #e5e7eb; border-radius: 99px; margin-bottom: 1rem; overflow: hidden; }
+        .progress-bar-inner { height: 100%; width: 0%; background-color: var(--color-brand-primary); border-radius: 99px; transition: width 0.4s ease; }
+
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div id="splash-screen">
+        <img src="ssu-logo.png" alt="Sri Sri University Logo Animation">
+    </div>
+
+    <header class="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="#" class="flex items-center space-x-3">
+                <img src="ssu-logo.png" alt="SSU Logo" class="w-10 h-10">
+                <span class="text-2xl font-bold" style="color: var(--color-brand-primary);">SDG 7</span>
+                <span class="hidden md:inline text-xl font-semibold text-gray-700">Clean Energy India</span>
+            </a>
+            <div class="flex items-center space-x-2 md:space-x-4 text-sm md:text-base">
+                <a href="#about" class="text-gray-600 hover:text-[var(--color-brand-primary)] transition-all duration-300 hover:scale-110">About</a> <a href="#connections" class="text-gray-600 hover:text-[var(--color-brand-primary)] transition-all duration-300 hover:scale-110">Connections</a> <a href="#impact" class="text-gray-600 hover:text-[var(--color-brand-primary)] transition-all duration-300 hover:scale-110">Impact</a> <a href="#types" class="text-gray-600 hover:text-[var(--color-brand-primary)] transition-all duration-300 hover:scale-110">Types</a> <a href="#progress" class="text-gray-600 hover:text-[var(--color-brand-primary)] transition-all duration-300 hover:scale-110">Progress</a> <a href="app.html" class="text-white px-4 py-2 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 hover:-translate-y-0.5" style="background-color: var(--color-brand-primary); hover:background-color: var(--color-brand-primary-dark);"> Urja Tracker
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <section class="bg-gradient-to-br from-[var(--color-brand-primary)] to-[var(--color-brand-primary-dark)] h-[90vh] flex items-center justify-center text-center relative overflow-hidden leaves-container">
+        <div class="absolute top-0 left-0 w-full h-full pointer-events-none z-10">
+            <div class="leaf"></div><div class="leaf"></div><div class="leaf"></div><div class="leaf"></div><div class="leaf"></div>
+            <div class="leaf"></div><div class="leaf"></div><div class="leaf"></div><div class="leaf"></div><div class="leaf"></div>
+        </div>
+        <div class="absolute inset-0 bg-black opacity-60"></div>
+        <div class="relative z-20 text-white px-6">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight mb-4 drop-shadow-lg reveal">Powering a Sustainable Future</h1>
+            <p class="text-lg sm:text-xl md:text-2xl font-light mb-8 max-w-3xl mx-auto drop-shadow-lg reveal" style="transition-delay: 200ms;">Achieving affordable, reliable, and clean energy for all is not just a goal—it's a necessity for India's growth and a healthy planet.</p>
+            <a href="#about" class="inline-block text-white px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-xl reveal" style="background-color: var(--color-brand-primary); hover:background-color: var(--color-brand-primary-dark); transition-delay: 400ms;">Discover the Mission</a>
+        </div>
+    </section>
+
+    <section id="about" class="py-24 px-6 bg-gray-50 leaves-container">
+        <div class="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
+            <div class="leaf"></div><div class="leaf"></div><div class="leaf"></div><div class="leaf"></div><div class="leaf"></div>
+            <div class="leaf"></div><div class="leaf"></div><div class="leaf"></div><div class="leaf"></div><div class="leaf"></div>
+        </div>
+        <div class="container mx-auto max-w-4xl text-center relative z-10">
+            <div class="reveal">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-4" style="color: var(--color-brand-primary);">What is SDG 7?</h2>
+                <p class="text-lg text-gray-600 mb-12">Sustainable Development Goal 7 is a universal call to action to ensure access to affordable, reliable, sustainable, and modern energy for all by 2030. It's a cornerstone for eradicating poverty, fighting climate change, and building prosperous, resilient communities.</p>
+                <div class="flex justify-center"><img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-07.jpg" alt="Official SDG 7 Logo: Affordable and Clean Energy" class="w-56 h-56 rounded-lg shadow-xl"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="connections" class="py-24 px-6 bg-white">
+        <div class="container mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl sm:text-4xl font-bold" style="color: var(--color-brand-primary);">One Goal, Many Connections</h2>
+                <p class="text-lg text-gray-600 mt-2 max-w-3xl mx-auto">Achieving SDG 7 is fundamental to the success of many other Sustainable Development Goals.</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center reveal">
+                <div class="flex flex-col items-center p-4 rounded-lg transition-transform transform hover:scale-105"><img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-01.jpg" alt="SDG 1: No Poverty" class="w-24 h-24 mb-3"><h3 class="font-semibold text-lg text-gray-700">No Poverty (SDG 1)</h3><p class="text-sm text-gray-500">Energy access powers economic opportunities for the poor.</p></div>
+                <div class="flex flex-col items-center p-4 rounded-lg transition-transform transform hover:scale-105"><img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-03.jpg" alt="SDG 3: Good Health and Well-being" class="w-24 h-24 mb-3"><h3 class="font-semibold text-lg text-gray-700">Good Health (SDG 3)</h3><p class="text-sm text-gray-500">Clean energy reduces pollution and powers healthcare facilities.</p></div>
+                <div class="flex flex-col items-center p-4 rounded-lg transition-transform transform hover:scale-105"><img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-11.jpg" alt="SDG 11: Sustainable Cities and Communities" class="w-24 h-24 mb-3"><h3 class="font-semibold text-lg text-gray-700">Sustainable Cities (SDG 11)</h3><p class="text-sm text-gray-500">Powers sustainable transport and urban infrastructure.</p></div>
+                <div class="flex flex-col items-center p-4 rounded-lg transition-transform transform hover:scale-105"><img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-13.jpg" alt="SDG 13: Climate Action" class="w-24 h-24 mb-3"><h3 class="font-semibold text-lg text-gray-700">Climate Action (SDG 13)</h3><p class="text-sm text-gray-500">Shifting to renewables is key to combating climate change.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="impact" class="py-24 px-6 bg-gray-50">
+        <div class="container mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl sm:text-4xl font-bold" style="color: var(--color-brand-primary);">Why Clean Energy Matters</h2>
+                <p class="text-lg text-gray-600 mt-2 max-w-2xl mx-auto">Transitioning to clean energy creates a ripple effect of positive change.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div class="bg-white p-8 rounded-lg shadow-lg reveal transition-all duration-300 hover:shadow-xl hover:-translate-y-2" style="transition-delay: 100ms;"><h3 class="text-2xl font-semibold text-gray-800 mb-3">Environmental Health</h3><p class="text-gray-600">Reduces air and water pollution, combats climate change by cutting greenhouse gas emissions, and protects biodiversity.</p></div>
+                <div class="bg-white p-8 rounded-lg shadow-lg reveal transition-all duration-300 hover:shadow-xl hover:-translate-y-2" style="transition-delay: 250ms;"><h3 class="text-2xl font-semibold text-gray-800 mb-3">Economic Growth</h3><p class="text-gray-600">Creates green jobs in manufacturing and installation, stimulates innovation, and provides energy security by reducing reliance on imported fuels.</p></div>
+                <div class="bg-white p-8 rounded-lg shadow-lg reveal transition-all duration-300 hover:shadow-xl hover:-translate-y-2" style="transition-delay: 400ms;"><h3 class="text-2xl font-semibold text-gray-800 mb-3">Social Well-being</h3><p class="text-gray-600">Improves public health with cleaner air, enhances energy access for rural communities, and supports education and healthcare services.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="types" class="py-24 px-6 bg-white">
+        <div class="container mx-auto text-center">
+            <div class="reveal"><h2 class="text-3xl sm:text-4xl font-bold mb-16" style="color: var(--color-brand-primary);">Types of Clean Energy</h2></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div class="bg-gray-50 p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 reveal"><div class="bg-yellow-400 text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-md"><svg class="w-12 h-12" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 10.607a1 1 0 011.414 0l.707-.707a1 1 0 111.414 1.414l-.707.707a1 1 0 01-1.414 0zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg></div><h3 class="text-2xl font-semibold text-gray-800 mb-3">Solar Power</h3><p class="text-gray-600">Harnessing sunlight via photovoltaic panels, solar is a fast-growing, clean, and abundant source for generating electricity.</p></div>
+                <div class="bg-gray-50 p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 reveal" style="transition-delay: 150ms;"><div class="bg-sky-500 text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-md"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path><path d="M15.29 5.29C16.85 6.85 18 9.35 18 12c0 2.65-1.15 5.15-2.71 6.71" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="stroke-dasharray: 6, 4;"></path><path d="M8.71 5.29C7.15 6.85 6 9.35 6 12c0 2.65 1.15 5.15 2.71 6.71" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="stroke-dasharray: 6, 4;"></path></svg></div><h3 class="text-2xl font-semibold text-gray-800 mb-3">Wind Power</h3><p class="text-gray-600">Wind turbines convert the kinetic energy of wind into electricity. It's a non-polluting and sustainable source of power.</p></div>
+                <div class="bg-gray-50 p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 reveal" style="transition-delay: 300ms;"><div class="bg-blue-600 text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-md"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path d="M3.27 15.65c1.42 1.42 3.27 2.35 5.23 2.35s3.81-.93 5.23-2.35" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="stroke-dasharray: 6, 4;"></path></svg></div><h3 class="text-2xl font-semibold text-gray-800 mb-3">Hydropower</h3><p class="text-gray-600">Hydropower uses the force of flowing water to spin turbines, providing a stable and reliable source of clean electricity.</p></div>
+                <div class="bg-gray-50 p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 reveal" style="transition-delay: 450ms;"><div class="bg-orange-600 text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-md"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div><h3 class="text-2xl font-semibold text-gray-800 mb-3">Geothermal</h3><p class="text-gray-600">This energy source taps into the Earth's internal heat to generate steam, which powers electricity generators.</p></div>
+                <div class="bg-gray-50 p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 reveal" style="transition-delay: 600ms;"><div class="bg-lime-600 text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-md"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7.014A10.004 10.004 0 0122 12c0 5.523-4.477 10-10 10-2.273 0-4.38-.756-6.071-2.036"></path></svg></div><h3 class="text-2xl font-semibold text-gray-800 mb-3">Biomass</h3><p class="text-gray-600">Biomass energy is generated from organic materials like wood, crops, and waste, turning them into a renewable power source.</p></div>
+                <div class="bg-gray-50 p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 reveal" style="transition-delay: 750ms;"><div class="bg-indigo-500 text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-md"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16M10 4l-6 8h16l-6-8z"></path></svg></div><h3 class="text-2xl font-semibold text-gray-800 mb-3">Tidal Energy</h3><p class="text-gray-600">A form of hydropower that converts the. energy obtained from tides into useful forms of power, mainly electricity.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="progress" class="py-24 px-6 bg-gray-50">
+        <div class="container mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl sm:text-4xl font-bold" style="color: var(--color-brand-primary);">India's Progress Towards SDG 7</h2>
+                <p class="text-lg text-gray-600 mt-2 max-w-2xl mx-auto">India is making significant strides in its clean energy transition, becoming a global leader in renewables.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div class="bg-white p-8 rounded-lg shadow-lg reveal transition-all duration-300 hover:shadow-xl hover:-translate-y-2" style="transition-delay: 100ms;"><div class="text-5xl font-bold mb-2" style="color: var(--color-brand-primary);">500 GW</div><p class="text-gray-600">India's ambitious goal for non-fossil fuel energy capacity by 2030, a cornerstone of its climate commitment.</p></div>
+                <div class="bg-white p-8 rounded-lg shadow-lg reveal transition-all duration-300 hover:shadow-xl hover:-translate-y-2" style="transition-delay: 250ms;"><div class="text-5xl font-bold mb-2" style="color: var(--color-brand-primary);">190+ GW</div><p class="text-gray-600">Total installed renewable energy capacity, making India one of the world's largest clean energy producers.</p></div>
+                <div class="bg-white p-8 rounded-lg shadow-lg reveal transition-all duration-300 hover:shadow-xl hover:-translate-y-2" style="transition-delay: 400ms;"><div class="text-5xl font-bold mb-2" style="color: var(--color-brand-primary);">99%+</div><p class="text-gray-600">Households electrified under national schemes, achieving near-universal energy access for millions.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="help" class="py-24 px-6 text-white" style="background-color: var(--color-brand-primary);">
+        <div class="container mx-auto text-center reveal">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-4">Be a Part of the Solution</h2>
+            <p class="text-lg mb-12 max-w-3xl mx-auto" style="color: var(--color-brand-accent);">Individual actions, when combined, create a powerful movement for change. Here’s how you can contribute to India's clean energy goals.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
+                <div class="p-6 rounded-lg transition-transform transform hover:scale-105" style="background-color: var(--color-brand-primary-dark);"><h3 class="font-bold text-xl mb-2">1. Conserve Energy</h3><p style="color: var(--color-brand-accent);">Reduce your electricity consumption by using energy-efficient appliances, switching off lights, and being mindful of your daily usage.</p></div>
+                <div class="p-6 rounded-lg transition-transform transform hover:scale-105" style="background-color: var(--color-brand-primary-dark);"><h3 class="font-bold text-xl mb-2">2. Adopt Renewables</h3><p style="color: var(--color-brand-accent);">Consider installing rooftop solar panels. Many government subsidies and schemes make this more affordable than ever.</p></div>
+                <div class="p-6 rounded-lg transition-transform transform hover:scale-105" style="background-color: var(--color-brand-primary-dark);"><h3 class="font-bold text-xl mb-2">3. Support Green Policies</h3><p style="color: var(--color-brand-accent);">Stay informed about and support local and national policies that promote renewable energy and energy efficiency standards.</p></div>
+                <div class="p-6 rounded-lg transition-transform transform hover:scale-105" style="background-color: var(--color-brand-primary-dark);"><h3 class="font-bold text-xl mb-2">4. Educate & Advocate</h3><p style="color: var(--color-brand-accent);">Spread awareness in your community about the importance of clean energy and encourage others to take action.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-800 text-gray-400 py-12 px-6">
+        <div class="container mx-auto text-center">
+            <p class="mb-4">&copy; 2025 SDG 7 Initiative. All rights reserved.</p>
+            <div class="flex justify-center space-x-6">
+                <a href="#" class="hover:text-white transition-colors duration-300">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition-colors duration-300">Terms of Service</a>
+                <a href="#" class="hover:text-white transition-colors duration-300">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="choice-modal" class="modal-backdrop">
+        <div class="modal-content text-center">
+            <img src="ssu-logo.png" alt="SSU Logo" class="w-20 h-20 mx-auto mb-4">
+            <h3 class="text-2xl font-bold mb-2" style="color: var(--color-brand-primary);">Welcome to Urja Tracker</h3>
+            <p class="text-gray-600 mb-6">What would you like to do today?</p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button id="btn-open-quiz" class="flex-1 p-4 rounded-lg transition-all hover:scale-105 hover:shadow-lg" style="background-color: var(--color-brand-accent); border: 1px solid var(--color-brand-secondary);"> <span class="text-lg font-semibold" style="color: var(--color-brand-primary);">What's My Carbon Footprint?</span>
+                    <p class="text-sm" style="color: var(--color-brand-primary-dark);">Take a 1-min quiz</p>
+                </button>
+                <a href="app.html" id="btn-open-tracker" class="flex-1 p-4 rounded-lg text-white transition-all hover:shadow-lg hover:scale-105 hover:-translate-y-0.5" style="background-color: var(--color-brand-primary);"> <span class="text-lg font-semibold">Go to Urja Tracker</span>
+                    <p class="text-sm" style="color: var(--color-brand-accent);">Track campus energy savings</p>
+                </a>
+            </div>
+            </div>
+    </div>
+
+
+    <div id="modal" class="modal-backdrop">
+        <div class="modal-content">
+            <h3 id="modal-title" class="text-2xl font-bold text-gray-800 mb-4">Modal Title</h3>
+            <div id="modal-body" class="text-gray-600">
+                <p>This is the modal body.</p>
+            </div>
+            <div id="modal-footer" class="mt-6 flex justify-end gap-3">
+                <button id="modal-close-btn" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Close</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- MODIFICATION: Check if we came from the app ---
+            const urlParams = new URLSearchParams(window.location.search);
+            const cameFromApp = urlParams.get('ref') === 'app';
+            // --- END MODIFICATION ---
+
+            // Splash Screen Logic
+            const splashScreen = document.getElementById('splash-screen');
+            const splashLogo = splashScreen.querySelector('img');
+            
+            // --- NEW: Modal Selectors ---
+            const choiceModal = document.getElementById('choice-modal');
+            const quizModal = document.getElementById('modal');
+            const quizModalTitle = document.getElementById('modal-title');
+            const quizModalBody = document.getElementById('modal-body');
+            const quizModalCloseBtn = document.getElementById('modal-close-btn');
+            const btnOpenQuiz = document.getElementById('btn-open-quiz');
+            // --- END NEW ---
+            
+            if (splashScreen && splashLogo) {
+                splashScreen.addEventListener('animationend', () => {
+                    splashScreen.classList.add('fade-out');
+                });
+
+                splashScreen.addEventListener('transitionend', (event) => {
+                    if (event.propertyName === 'opacity') {
+                        splashScreen.style.display = 'none';
+                        
+                        // --- MODIFICATION: Only open modal if NOT from app ---
+                        if (!cameFromApp) {
+                            openChoiceModal();
+                        }
+                        // --- END MODIFICATION ---
+                    }
+                });
+            } else {
+                 // --- MODIFICATION: Also check here if not from app ---
+                 if (!cameFromApp) {
+                    openChoiceModal();
+                 }
+                 // --- END MODIFICATION ---
+            }
+            // End Splash Screen Logic
+
+
+            // Scroll animation observer
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            const elementsToReveal = document.querySelectorAll('.reveal');
+            elementsToReveal.forEach(el => observer.observe(el));
+
+            
+            // --- NEW: Modal Control Functions ---
+            function openChoiceModal() {
+                if(choiceModal) choiceModal.classList.add('visible');
+            }
+            function closeChoiceModal() {
+                if(choiceModal) choiceModal.classList.remove('visible');
+            }
+            function openQuizModal() { 
+                if(quizModal) quizModal.classList.add('visible'); 
+            }
+            function closeQuizModal() { 
+                if(quizModal) quizModal.classList.remove('visible'); 
+            }
+            
+            // Add listeners for new choice buttons
+            if(btnOpenQuiz) {
+                btnOpenQuiz.addEventListener('click', () => {
+                    closeChoiceModal();
+                    startFootprintQuiz(); // Start the quiz
+                    openQuizModal(); // Show the quiz modal
+                });
+            }
+            
+            // Add listeners for existing quiz modal
+            quizModalCloseBtn.addEventListener('click', closeQuizModal);
+            quizModal.addEventListener('click', (e) => { if (e.target === quizModal) closeQuizModal(); });
+            // --- END NEW ---
+
+
+            const quizQuestions = [
+                { question: "1. How do you primarily commute?", options: [ { text: "Public Transport / Walk / Cycle", value: 150 }, { text: "2-Wheeler", value: 300 }, { text: "4-Wheeler", value: 900 }, { text: "Mix", value: 500 } ] },
+                { question: "2. Weekly private vehicle travel?", options: [ { text: "None", value: 0 }, { text: "< 50 km", value: 280 }, { text: "50-150 km", value: 700 }, { text: "> 150 km", value: 1500 } ] },
+                { question: "3. Round-trip flights per year?", options: [ { text: "None", value: 0 }, { text: "1-2 Domestic", value: 400 }, { text: "1-2 International", value: 2000 }, { text: "Many", value: 5000 } ] },
+                { question: "4. Avg. monthly electricity bill?", options: [ { text: "< ₹500", value: 590 }, { text: "₹500-₹1500", value: 1230 }, { text: "₹1500-₹3000", value: 2755 }, { text: "> ₹3000", value: 3936 } ] },
+                { question: "5. Main cooking fuel?", options: [ { text: "LPG (1/month)", value: 511 }, { text: "LPG (1/2-3 months)", value: 250 }, { text: "PNG", value: 400 }, { text: "Electric/Other", value: 300 } ] },
+                { question: "6. Your diet?", options: [ { text: "Vegan", value: 1500 }, { text: "Vegetarian", value: 1700 }, { text: "Average (Some meat)", value: 2500 }, { text: "Daily Meat/Fish", value: 3300 } ] },
+                { question: "7. How often buy new items?", options: [ { text: "Rarely/Second-hand", value: 400 }, { text: "Few months", value: 800 }, { text: "Monthly", value: 1500 }, { text: "Weekly", value: 3000 } ] },
+                { question: "8. Non-recyclable waste?", options: [ { text: "Minimal", value: 100 }, { text: "1 small bin/day", value: 250 }, { text: "1 large bin/day", value: 500 }, { text: "Multiple bins/day", value: 800 } ] },
+                { question: "9. Household water use?", options: [ { text: "Conservative", value: 100 }, { text: "Average", value: 150 }, { text: "High", value: 250 } ] },
+                { question: "10. Summer AC use?", options: [ { text: "Never", value: 0 }, { text: "Rarely", value: 200 }, { text: "Daily (4-6 hrs)", value: 600 }, { text: "All Day", value: 1200 } ] }
+            ];
+
+            let currentQuestionIndex = 0;
+            let totalFootprintKg = 0;
+
+            function renderQuestion() {
+                const qData = quizQuestions[currentQuestionIndex];
+                const progressPercent = (currentQuestionIndex / quizQuestions.length) * 100;
+                const optionsHtml = qData.options.map(opt => `<button class="answer-btn" data-value="${opt.value}">${opt.text}</button>`).join('');
+                
+                quizModalBody.innerHTML = `
+                    <div class="progress-bar-container"><div class="progress-bar-inner" style="width: ${progressPercent}%;"></div></div>
+                    <p class="text-lg font-semibold text-gray-800 mb-4">${qData.question}</p>
+                    <div class="space-y-2">${optionsHtml}</div>`;
+                
+                document.querySelectorAll('.answer-btn').forEach(btn => btn.addEventListener('click', handleAnswerClick));
+            }
+
+            function handleAnswerClick(e) {
+                totalFootprintKg += parseFloat(e.currentTarget.dataset.value);
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizQuestions.length) {
+                    renderQuestion();
+                } else {
+                    showFinalResults();
+                }
+            }
+
+            function showFinalResults() {
+                const totalFootprintTonnes = totalFootprintKg / 1000;
+                localStorage.setItem('userCarbonFootprint', totalFootprintTonnes.toFixed(2));
+                
+                const UNIVERSITY_AVG_TONNES = 3.0; 
+                const INDIA_AVG_TONNES = 1.9; 
+                const WORLD_AVG_TONNES = 4.8; 
+                
+                quizModalTitle.textContent = "Your Footprint Result";
+                quizModalBody.innerHTML = `
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <p class="text-sm text-gray-600">Your Estimated Annual Footprint:</p>
+                        <p class="text-4xl font-bold my-2" style="color: var(--color-brand-primary);">${totalFootprintTonnes.toFixed(2)} tonnes CO₂e</p>
+                    </div>
+                    <h4 class="font-semibold text-gray-800 my-3">How you compare (per person, per year):</h4>
+                    <div class="space-y-2">
+                        <div class="p-3 rounded-lg" style="background-color: var(--color-brand-accent); border: 1px solid var(--color-brand-secondary);">
+                            <div class="flex justify-between items-center"><span class="font-medium" style="color: var(--color-brand-primary);">You</span><span class="font-bold" style="color: var(--color-brand-primary);">${totalFootprintTonnes.toFixed(2)} t</span></div>
+                        </div>
+                        <div class="p-3 bg-gray-100 rounded-lg"><div class="flex justify-between items-center"><span class="font-medium text-gray-700">Your University (Avg)</span><span class="font-bold text-gray-800">${UNIVERSITY_AVG_TONNES.toFixed(1)} t</span></div></div>
+                        <div class="p-3 bg-gray-100 rounded-lg"><div class="flex justify-between items-center"><span class="font-medium text-gray-700">Average in India</span><span class="font-bold text-gray-800">${INDIA_AVG_TONNES.toFixed(1)} t</span></div></div>
+                        <div class="p-3 bg-gray-100 rounded-lg"><div class="flex justify-between items-center"><span class="font-medium text-gray-700">World Average</span><span class="font-bold text-gray-800">${WORLD_AVG_TONNES.toFixed(1)} t</span></div></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4">*This is a simplified estimate for educational purposes. <a href="app.html" class="font-bold text-[var(--color-brand-primary)] hover:underline">Now, go to Urja Tracker!</a></p>`;
+            }
+
+            function startFootprintQuiz() {
+                currentQuestionIndex = 0;
+                totalFootprintKg = 0;
+                quizModalTitle.textContent = "What's Your Carbon Footprint?";
+                renderQuestion();
+            }
+            
+        });
+    </script>
+
+</body>
+</html>

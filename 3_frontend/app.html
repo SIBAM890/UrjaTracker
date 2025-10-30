@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urja Track - Live Dashboard</title>
+    <link rel="icon" href="ssu-logo.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; 
+        }
+        :root {
+            --color-brand-primary: #63182b; /* SSU Maroon */
+            --color-brand-primary-dark: #4a1220; /* Darker Maroon */
+            --color-brand-secondary: #d2a15f; /* SSU Gold */
+            --color-brand-accent: #f5eeda; /* SSU Cream */
+        }
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .btn-primary {
+            background-color: var(--color-brand-primary);
+            color: white;
+            font-weight: 600;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: var(--color-brand-primary-dark);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            /* align-items: center; */ /* MODIFIED: Changed to flex-start with padding */
+            align-items: flex-start;
+            padding-top: 10vh; /* MODIFIED: This increases the "distance" from the top */
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-backdrop.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 500px;
+            width: 90%;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-backdrop.visible .modal-content {
+            transform: scale(1);
+        }
+        /* Connection Status Dot */
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            transition: background-color 0.5s ease;
+        }
+        .status-dot.connecting {
+            background-color: #f59e0b; /* Amber */
+            animation: pulse 1.5s infinite;
+        }
+        .status-dot.connected {
+            background-color: #10b981; /* Green */
+        }
+        .status-dot.error {
+            background-color: #ef4444; /* Red */
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Table styles for baseline */
+        .baseline-table {
+            width: 100%;
+            font-size: 0.875rem;
+            border-collapse: collapse;
+        }
+        .baseline-table th, .baseline-table td {
+            padding: 8px 4px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .baseline-table th {
+            font-weight: 600;
+            color: #374151;
+        }
+        .baseline-table td {
+            color: #6b7280;
+        }
+        .baseline-table .total-row {
+            font-weight: 700;
+            color: var(--color-brand-primary);
+            border-top: 2px solid var(--color-brand-primary);
+        }
+
+        /* --- NEW: Style for clickable info cards --- */
+        .info-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .info-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="app" class="min-h-screen p-4 sm:p-6 lg:p-8">
+        
+        <header class="mb-8">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <a href="index.html?ref=app" class="flex items-center gap-2 transition-all duration-300 hover:scale-105" title="Back to SDG 7 Home"> <img src="ssu-logo.png" alt="SSU Logo" class="w-10 h-10">
+                    <h1 class="text-2xl sm:text-3xl font-bold" style="color: var(--color-brand-primary);">Urja Tracker</h1>
+                </a>
+                <div class="flex items-center gap-2">
+                    <div id="connection-status" class="status-dot connecting"></div>
+                    <span id="connection-text" class="text-sm font-medium text-gray-500">Connecting...</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto">
+            <div id="main-content" class="fade-in">
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <div class="lg:col-span-1 space-y-8">
+                        
+                        <section id="university-data-card" class="card p-6 info-card">
+                            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="ph-bold ph-buildings" style="color: var(--color-brand-primary);"></i>
+                                University Baseline (Daily Est.)
+                            </h2>
+                            <p classS="text-sm text-gray-500 mb-4">This is the estimated daily power consumption baseline for the university.</p>
+                            <div class="max-h-96 overflow-y-auto">
+                                <table class="baseline-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Building / Device</th>
+                                            <th class="text-right">kWh/Day</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="uni-data-table-body">
+                                        </tbody>
+                                    <tfoot>
+                                        <tr class="total-row">
+                                            <td>Total University</td>
+                                            <td id="uni-total-display" class="text-right">0.00</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </section>
+                        
+                        <section class="card p-6 text-white" style="background-color: var(--color-brand-primary);">
+                             <div class="flex items-start gap-4">
+                                <i class="ph-bold ph-lightbulb text-5xl flex-shrink-0 mt-1" style="color: var(--color-brand-secondary);"></i>
+                                <div>
+                                    <h2 class="text-xl font-bold mb-2">Eco-Tip of the Day</h2>
+                                    <p id="eco-tip" class="mb-4" style="color: var(--color-brand-accent);">one do one simple thing</p>
+                                    <button id="more-tips-btn" class="font-semibold text-white inline-flex items-center gap-1 hover:underline transition-all duration-300 hover:scale-105"> More Tips <i class="ph-bold ph-arrow-right"></i>
+                                    </button>
+                                </div>
+                             </div>
+                        </section>
+
+                    </div>
+
+                    <div class="lg:col-span-2 space-y-8">
+                        
+                        <section id="live-status-card" class="card p-6 info-card">
+                            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="ph-bold ph-broadcast" style="color: var(--color-brand-primary);"></i>
+                                Smart Classroom Prototype (LIVE)
+                            </h2>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+                                <div class="p-5 flex items-center gap-4">
+                                    <div class="p-3 rounded-full" style="background-color: var(--color-brand-accent);">
+                                        <i class="ph-bold ph-users text-3xl" style="color: var(--color-brand-primary);"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 font-medium">Room Presence</p>
+                                        <p id="live-presence" class="text-2xl font-bold text-gray-800">--</p>
+                                    </div>
+                                </div>
+                                <div class="p-5 flex items-center gap-4">
+                                    <div class="bg-blue-100 p-3 rounded-full">
+                                         <i class="ph-bold ph-thermometer text-3xl text-blue-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 font-medium">Temperature</p>
+                                        <p id="live-temp" class="text-2xl font-bold text-gray-800">-- °C</p>
+                                    </div>
+                                </div>
+                                <div class="p-5 flex items-center gap-4">
+                                    <div class="p-3 rounded-full" style="background-color: var(--color-brand-accent);">
+                                        <i class="ph-bold ph-lightning text-3xl" style="color: var(--color-brand-primary);"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 font-medium">Live Power Draw</p>
+                                        <p id="live-power" class="text-2xl font-bold text-gray-800">-- W</p>
+                                    </div>
+                                </div>
+                                <div class="p-5 flex items-center gap-4">
+                                    <div class="p-3 rounded-full" style="background-color: var(--color-brand-accent);">
+                                        <i class="ph-bold ph-footprints text-3xl" style="color: var(--color-brand-primary);"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 font-medium">My Footprint (Est.)</p>
+                                        <p id="card-value-4" class="text-2xl font-bold text-gray-800">--</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <section id="chart-card" class="card p-6 info-card">
+                             <div class="flex justify-between items-center mb-4">
+                                <h2 id="chart-title" class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                    <i class="ph-bold ph-chart-bar" style="color: var(--color-brand-primary);"></i>
+                                    University vs. Prototype Comparison (Daily kWh)
+                                </h2>
+                            </div>
+                            <div class="h-64 sm:h-80">
+                                <canvas id="energy-chart"></canvas>
+                            </div>
+                        </section>
+                        
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal" class="modal-backdrop">
+        <div class="modal-content">
+            <h3 id="modal-title" class="text-2xl font-bold text-gray-800 mb-4">Modal Title</h3>
+            <div id="modal-body" class="text-gray-600">
+                <p>This is the modal body.</p>
+            </div>
+            <div id="modal-footer" class="mt-6 flex justify-end gap-3">
+                <button id="modal-close-btn" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all duration-300 hover:scale-105 hover:shadow-md">Close</button> </div>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- API & DATA CONFIG ---
+    const API_URL = 'http://127.0.0.1:5000'; // URL of your Python backend
+    const POLLING_INTERVAL_MS = 2000; // 2 seconds (should match Arduino)
+    
+    // --- NEW: HARDCODED UNIVERSITY BASELINE DATA ---
+    // You can edit this object to change the baseline data
+    const UNIVERSITY_BASELINE = {
+        "buildings": [
+            {
+                "name": "Admin Building (Est.)",
+                "devices": [
+                    { "name": "Lights", "kWh": 150 },
+                    { "name": "AC Units", "kWh": 400 },
+                    { "name": "Computers", "kWh": 100 }
+                ]
+            },
+            {
+                "name": "Academic Block A (Est.)",
+                "devices": [
+                    { "name": "Classroom Lights", "kWh": 300 },
+                    { "name": "Projectors", "kWh": 80 },
+                    { "name": "Fans", "kWh": 120 },
+                    { "name": "AC Units", "kWh": 600 }
+                ]
+            },
+            {
+                "name": "Library (Est.)",
+                "devices": [
+                    { "name": "Lights", "kWh": 200 },
+                    { "name": "AC Units", "kWh": 350 },
+                    { "name": "Computers", "kWh": 150 }
+                ]
+            },
+            {
+                "name": "Hostels (Est. Total)",
+                "devices": [
+                    { "name": "Lights & Fans", "kWh": 800 },
+                    { "name": "Water Heaters/Pumps", "kWh": 400 }
+                ]
+            }
+        ]
+    };
+    
+    // --- APP STATE ---
+    let energyChart;
+    let g_livePrototypeKWh = 0.0; // Global accumulator for LIVE energy
+    let g_universityTotalKWh = 0.0; // Global var for uni total
+    
+    // --- STORAGE KEYS ---
+    const FOOTPRINT_KEY = 'userCarbonFootprint';
+
+    // --- DOM ELEMENTS (University Data) ---
+    const uniDataTableBody = document.getElementById('uni-data-table-body');
+    const uniTotalDisplay = document.getElementById('uni-total-display');
+    
+    // --- DOM ELEMENTS (Dashboard Cards) ---
+    const cardValue4 = document.getElementById('card-value-4'); // Footprint
+    const universityCard = document.getElementById('university-data-card');
+    const liveStatusCard = document.getElementById('live-status-card');
+    const chartCard = document.getElementById('chart-card');
+
+    // --- DOM ELEMENTS (Live Status) ---
+    const connectionStatusDot = document.getElementById('connection-status');
+    const connectionStatusText = document.getElementById('connection-text');
+    const livePresence = document.getElementById('live-presence');
+    const liveTemp = document.getElementById('live-temp');
+    const livePower = document.getElementById('live-power');
+
+    // --- DOM ELEMENTS (Misc) ---
+    const chartTitle = document.getElementById('chart-title');
+    const ecoTipEl = document.getElementById('eco-tip');
+    const moreTipsBtn = document.getElementById('more-tips-btn');
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    
+    // MODIFIED: This array is no longer used by displayRandomEcoTip, but is kept for the 'More Tips' modal
+    const ECO_TIPS = [
+        "Use natural light whenever possible instead of turning on lights.",
+        "Turn off lights and fans when you leave a room, even for a short time.",
+        "Set your AC to 24-26°C for optimal energy efficiency.",
+        "Report any flickering lights or faulty equipment, as they can consume more power.",
+        "Unplug chargers when not in use. They still draw 'vampire power'.",
+        "Enable 'sleep mode' on computers and projectors when they are not in active use.",
+        "Ensure rooms are well-sealed to prevent cool air from escaping when the AC is on."
+    ];
+
+    // --- INITIALIZATION ---
+    function init() {
+        renderUniversityData(); // NEW: Render the baseline table
+        renderComparisonChart(); // Draw the main chart
+        // displayRandomEcoTip(); // MODIFIED: Removed to keep the single tip from the HTML
+        setupEventListeners();
+        loadFootprintResult(); // Load footprint on init
+        startHardwarePolling(); // Start fetching live data
+    }
+    
+    // --- EVENT LISTENERS ---
+    function setupEventListeners() {
+        moreTipsBtn.addEventListener('click', showMoreTips);
+        modalCloseBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); }); 
+        
+        universityCard.addEventListener('click', (e) => handleInfoCardClick(e, 'university'));
+        liveStatusCard.addEventListener('click', (e) => handleInfoCardClick(e, 'live'));
+        chartCard.addEventListener('click', (e) => handleInfoCardClick(e, 'chart'));
+    }
+
+    // --- NEW: INFO CARD CLICK HANDLER ---
+    function handleInfoCardClick(event, cardType) {
+        if (event.target.closest('button') || event.target.closest('a')) {
+            return;
+        }
+
+        let title = '';
+        let body = '';
+
+        switch (cardType) {
+            case 'university':
+                title = 'About: University Baseline';
+                body = '<p>This section shows the estimated daily energy consumption (baseline) for the entire university, broken down by building and device type. This is the "target" we are trying to save energy against.</p>';
+                break;
+            case 'live':
+                title = 'About: Live Prototype';
+                body = '<p>This panel shows real-time data from our smart classroom prototype. It includes:</p><ul class="list-disc list-inside mt-2"><li><b>Room Presence:</b> Detects if the room is occupied.</li><li><b>Temperature:</b> The current room temperature.</li><li><b>Live Power Draw:</b> The exact amount of power (in Watts) being used by the prototype right now.</li></ul>';
+                break;
+            case 'chart':
+                title = 'About: Comparison Chart';
+                body = '<p>This bar chart visually compares two key metrics:</p><ul class="list-disc list-inside mt-2"><li><b>Total University:</b> The fixed daily baseline energy (in kWh) for the whole campus.</li><li><b>Live Prototype:</b> The *accumulated* energy (in kWh) used by our prototype *so far today*. This value will grow from 0 throughout the day.</li></ul>';
+                break;
+        }
+        
+        if (title && body) {
+            showModalAlert(title, body);
+        }
+    }
+
+    // --- 1. LIVE HARDWARE DATA ---
+
+    function startHardwarePolling() {
+        fetchLiveData(); // Fetch immediately
+        setInterval(fetchLiveData, POLLING_INTERVAL_MS); // Then poll
+    }
+
+    async function fetchLiveData() {
+        try {
+            const response = await fetch(`${API_URL}/api/live_data`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            
+            updateLiveStatusCard(data, 'connected');
+            updateComparisonChart(data.power_watts);
+        } catch (error) {
+            console.error('Error fetching live data:', error);
+            updateLiveStatusCard({ error: error.message }, 'error');
+        }
+    }
+
+    function updateLiveStatusCard(data, status) {
+        if (status === 'connected') {
+            connectionStatusDot.className = 'status-dot connected';
+            connectionStatusText.textContent = 'Live';
+            livePresence.textContent = data.presence ? 'OCCUPIED' : 'EMPTY';
+            liveTemp.textContent = `${data.temperature_c.toFixed(1)} °C`;
+            livePower.textContent = `${data.power_watts.toFixed(1)} W`;
+        } else {
+            connectionStatusDot.className = 'status-dot error';
+            connectionStatusText.textContent = 'Offline';
+            livePresence.textContent = '--';
+            liveTemp.textContent = '-- °C';
+            livePower.textContent = '-- W';
+        }
+    }
+
+
+    // --- 2. UNIVERSITY DATA ---
+
+    function renderUniversityData() {
+        let totalKWh = 0;
+        let tableHtml = "";
+
+        UNIVERSITY_BASELINE.buildings.forEach(building => {
+            let buildingTotal = 0;
+            tableHtml += `
+                <tr class="font-semibold" style="background-color: var(--color-brand-accent);">
+                    <td>${building.name}</td>
+                    <td class="text-right"></td>
+                </tr>
+            `;
+            building.devices.forEach(device => {
+                buildingTotal += device.kWh;
+                tableHtml += `
+                    <tr>
+                        <td class="pl-4">${device.name}</td>
+                        <td class="text-right">${device.kWh.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            tableHtml += `
+                <tr class="font-medium">
+                    <td class="pl-2">Subtotal</td>
+                    <td class="text-right">${buildingTotal.toFixed(2)}</td>
+                </tr>
+            `;
+            totalKWh += buildingTotal;
+        });
+
+        // Set the global total
+        g_universityTotalKWh = totalKWh;
+        
+        // Render the table body and the total in the footer
+        uniDataTableBody.innerHTML = tableHtml;
+        uniTotalDisplay.textContent = `${totalKWh.toFixed(2)} kWh`;
+    }
+
+
+    // --- 3. MISC FUNCTIONS ---
+    
+    function displayRandomEcoTip() {
+        // This function is no longer called by init()
+        ecoTipEl.textContent = ECO_TIPS[Math.floor(Math.random() * ECO_TIPS.length)];
+    }
+    
+    function showMoreTips() {
+        let tipsHtml = '<ul class="list-disc list-inside space-y-2">';
+        ECO_TIPS.forEach(tip => {
+            tipsHtml += `<li>${tip}</li>`;
+        });
+        tipsHtml += '</ul>';
+        showModalAlert("Energy Saving Tips", tipsHtml);
+    }
+    
+    function loadFootprintResult() {
+        const footprintValueEl = document.getElementById('card-value-4');
+        const footprint = localStorage.getItem(FOOTPRINT_KEY);
+        
+        if (footprint) {
+            footprintValueEl.textContent = `${footprint} t`;
+        } else {
+            // Added classes for pop effect
+            footprintValueEl.innerHTML = `<a href="index.html" class="text-base hover:underline inline-block transition-all duration-300 hover:scale-110" style="color: var(--color-brand-primary);" title="Take the quiz!">Take Quiz</a>`;
+        }
+    }
+
+    // --- 4. MAIN CHART LOGIC ---
+
+    function renderComparisonChart() {
+        const ctx = document.getElementById('energy-chart').getContext('2d');
+        
+        energyChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Total University', 'Live Prototype'],
+                datasets: [{
+                    label: 'Daily Energy Usage (kWh)',
+                    data: [g_universityTotalKWh, g_livePrototypeKWh], // Use totals
+                    backgroundColor: [
+                        'rgba(99, 24, 43, 0.6)',    // SSU Maroon
+                        'rgba(0, 156, 218, 0.6)',   // Blue
+                    ],
+                    borderColor: [
+                        'rgba(99, 24, 43, 1)',
+                        'rgba(0, 156, 218, 1)',
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 5,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { 
+                    y: { 
+                        beginAtZero: true, 
+                        grid: { color: '#e5e7eb' },
+                        title: { display: true, text: 'Energy (kWh)' } 
+                    }, 
+                    x: { 
+                        grid: { display: false } 
+                    } 
+                },
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => `${context.parsed.y.toFixed(3)} kWh`
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    function updateComparisonChart(livePowerWatts = null) {
+        if (livePowerWatts !== null) {
+            // Accumulate live energy
+            const energySliceKWh = (livePowerWatts * (POLLING_INTERVAL_MS / 1000 / 3600));
+            g_livePrototypeKWh += energySliceKWh;
+        }
+
+        if (!energyChart) return; // Chart not ready
+
+        // Update chart data
+        energyChart.data.datasets[0].data[0] = g_universityTotalKWh;
+        energyChart.data.datasets[0].data[1] = g_livePrototypeKWh;
+        
+        energyChart.update('none'); // 'none' for no animation
+    }
+
+    // --- 5. MODAL CONTROLS ---
+
+    function openModal() { modal.classList.add('visible'); }
+    function closeModal() {
+        modal.classList.remove('visible');
+    }
+    function showModalAlert(title, bodyHtml) {
+        modalTitle.textContent = title;
+        modalBody.innerHTML = bodyHtml;
+        openModal();
+    }
+
+    // --- KICKSTART THE APP ---
+    init();
+});
+</script>
+</body>
+</html>
