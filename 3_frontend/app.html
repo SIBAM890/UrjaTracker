@@ -160,14 +160,14 @@
                         <section id="university-data-card" class="card p-6 info-card">
                             <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                 <i class="ph-bold ph-buildings" style="color: var(--color-brand-primary);"></i>
-                                University Baseline (Daily Est.)
+                                University Baseline (Daily)
                             </h2>
-                            <p classS="text-sm text-gray-500 mb-4">This is the estimated daily power consumption baseline for the university.</p>
+                            <p classS="text-sm text-gray-500 mb-4">This is the official daily power consumption baseline for the university, from the latest energy audit.</p>
                             <div class="max-h-96 overflow-y-auto">
                                 <table class="baseline-table">
                                     <thead>
                                         <tr>
-                                            <th>Building / Device</th>
+                                            <th>Source</th>
                                             <th class="text-right">kWh/Day</th>
                                         </tr>
                                     </thead>
@@ -281,44 +281,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const API_URL = 'http://127.0.0.1:5000'; // URL of your Python backend
     const POLLING_INTERVAL_MS = 2000; // 2 seconds (should match Arduino)
     
-    // --- NEW: HARDCODED UNIVERSITY BASELINE DATA ---
-    // You can edit this object to change the baseline data
+    // --- *** NEW: OFFICIAL UNIVERSITY BASELINE DATA *** ---
+    // This is now based on the official audit figures you provided
+    // 1,649.55 t CO2/yr @ 0.85 kg/kWh = 1,940,647 kWh/yr = 5316.84 kWh/day
     const UNIVERSITY_BASELINE = {
         "buildings": [
             {
-                "name": "Admin Building (Est.)",
+                "name": "Official University Baseline",
                 "devices": [
-                    { "name": "Lights", "kWh": 150 },
-                    { "name": "AC Units", "kWh": 400 },
-                    { "name": "Computers", "kWh": 100 }
-                ]
-            },
-            {
-                "name": "Academic Block A (Est.)",
-                "devices": [
-                    { "name": "Classroom Lights", "kWh": 300 },
-                    { "name": "Projectors", "kWh": 80 },
-                    { "name": "Fans", "kWh": 120 },
-                    { "name": "AC Units", "kWh": 600 }
-                ]
-            },
-            {
-                "name": "Library (Est.)",
-                "devices": [
-                    { "name": "Lights", "kWh": 200 },
-                    { "name": "AC Units", "kWh": 350 },
-                    { "name": "Computers", "kWh": 150 }
-                ]
-            },
-            {
-                "name": "Hostels (Est. Total)",
-                "devices": [
-                    { "name": "Lights & Fans", "kWh": 800 },
-                    { "name": "Water Heaters/Pumps", "kWh": 400 }
+                    { "name": "Total Electricity (from Audit)", "kWh": 5316.84 }
                 ]
             }
         ]
     };
+    // --- *** END OF MODIFICATION *** ---
     
     // --- APP STATE ---
     let energyChart;
@@ -398,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
         switch (cardType) {
             case 'university':
                 title = 'About: University Baseline';
-                body = '<p>This section shows the estimated daily energy consumption (baseline) for the entire university, broken down by building and device type. This is the "target" we are trying to save energy against.</p>';
+                body = '<p>This section shows the **official** daily energy consumption (baseline) for the entire university, taken from the latest environmental audit.</p><p class="mt-2">This figure (5,316.84 kWh/day) is the real-world metric we are comparing our prototype\'s savings against.</p>';
                 break;
             case 'live':
                 title = 'About: Live Prototype';
@@ -406,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'chart':
                 title = 'About: Comparison Chart';
-                body = '<p>This bar chart visually compares two key metrics:</p><ul class="list-disc list-inside mt-2"><li><b>Total University:</b> The fixed daily baseline energy (in kWh) for the whole campus.</li><li><b>Live Prototype:</b> The *accumulated* energy (in kWh) used by our prototype *so far today*. This value will grow from 0 throughout the day.</li></ul>';
+                body = '<p>This bar chart visually compares two key metrics:</p><ul class="list-disc list-inside mt-2"><li><b>Total University:</b> The fixed **official** daily baseline energy (in kWh) for the whole campus.</li><li><b>Live Prototype:</b> The *accumulated* energy (in kWh) used by our prototype *so far today*. This value will grow from 0 throughout the day.</li></ul>';
                 break;
         }
         
@@ -477,12 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </tr>
                 `;
             });
-            tableHtml += `
-                <tr class="font-medium">
-                    <td class="pl-2">Subtotal</td>
-                    <td class="text-right">${buildingTotal.toFixed(2)}</td>
-                </tr>
-            `;
+            // Removed the subtotal row as it's redundant for a single entry
             totalKWh += buildingTotal;
         });
 

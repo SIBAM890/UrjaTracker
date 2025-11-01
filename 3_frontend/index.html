@@ -334,19 +334,19 @@
             quizModal.addEventListener('click', (e) => { if (e.target === quizModal) closeQuizModal(); });
             // --- END NEW ---
 
-
+            
+            // --- *** MODIFIED QUIZ QUESTIONS *** ---
+            // Based on your request for simpler, daily-use questions.
             const quizQuestions = [
-                { question: "1. How do you primarily commute?", options: [ { text: "Public Transport / Walk / Cycle", value: 150 }, { text: "2-Wheeler", value: 300 }, { text: "4-Wheeler", value: 900 }, { text: "Mix", value: 500 } ] },
-                { question: "2. Weekly private vehicle travel?", options: [ { text: "None", value: 0 }, { text: "< 50 km", value: 280 }, { text: "50-150 km", value: 700 }, { text: "> 150 km", value: 1500 } ] },
-                { question: "3. Round-trip flights per year?", options: [ { text: "None", value: 0 }, { text: "1-2 Domestic", value: 400 }, { text: "1-2 International", value: 2000 }, { text: "Many", value: 5000 } ] },
-                { question: "4. Avg. monthly electricity bill?", options: [ { text: "< ₹500", value: 590 }, { text: "₹500-₹1500", value: 1230 }, { text: "₹1500-₹3000", value: 2755 }, { text: "> ₹3000", value: 3936 } ] },
-                { question: "5. Main cooking fuel?", options: [ { text: "LPG (1/month)", value: 511 }, { text: "LPG (1/2-3 months)", value: 250 }, { text: "PNG", value: 400 }, { text: "Electric/Other", value: 300 } ] },
-                { question: "6. Your diet?", options: [ { text: "Vegan", value: 1500 }, { text: "Vegetarian", value: 1700 }, { text: "Average (Some meat)", value: 2500 }, { text: "Daily Meat/Fish", value: 3300 } ] },
-                { question: "7. How often buy new items?", options: [ { text: "Rarely/Second-hand", value: 400 }, { text: "Few months", value: 800 }, { text: "Monthly", value: 1500 }, { text: "Weekly", value: 3000 } ] },
-                { question: "8. Non-recyclable waste?", options: [ { text: "Minimal", value: 100 }, { text: "1 small bin/day", value: 250 }, { text: "1 large bin/day", value: 500 }, { text: "Multiple bins/day", value: 800 } ] },
-                { question: "9. Household water use?", options: [ { text: "Conservative", value: 100 }, { text: "Average", value: 150 }, { text: "High", value: 250 } ] },
-                { question: "10. Summer AC use?", options: [ { text: "Never", value: 0 }, { text: "Rarely", value: 200 }, { text: "Daily (4-6 hrs)", value: 600 }, { text: "All Day", value: 1200 } ] }
+                { question: "1. What is your primary mode of daily travel?", options: [ { text: "Walk / Cycle", value: 50 }, { text: "Public Transport (Bus/Metro)", value: 200 }, { text: "2-Wheeler (Scooter/Bike)", value: 400 }, { text: "4-Wheeler (Car)", value: 1200 } ] },
+                { question: "2. What is your typical diet?", options: [ { text: "Vegetarian / Vegan", value: 1600 }, { text: "Occasional Non-Veg (a few times a week)", value: 2500 }, { text: "Daily Non-Veg (Meat/Fish)", value: 3300 } ] },
+                { question: "3. What's your average monthly electricity bill?", options: [ { text: "Low (Below ₹500)", value: 600 }, { text: "Medium (₹500 - ₹1500)", value: 1200 }, { text: "High (Above ₹1500)", value: 2800 } ] },
+                { question: "4. How many round-trip flights do you take per year?", options: [ { text: "None", value: 0 }, { text: "1-2 Flights (Domestic)", value: 400 }, { text: "Several Flights (Int'l or many domestic)", value: 2000 } ] },
+                { question: "5. How much do you use Air Conditioning (AC) in summer?", options: [ { text: "Never / Rarely", value: 50 }, { text: "Daily (a few hours)", value: 600 }, { text: "All Day", value: 1200 } ] },
+                { question: "6. How often do you buy new items (clothes, electronics, etc.)?", options: [ { text: "Rarely / Mostly second-hand", value: 400 }, { text: "Every few months", value: 800 }, { text: "Every month or more", value: 1500 } ] }
             ];
+            // --- *** END OF MODIFICATION *** ---
+
 
             let currentQuestionIndex = 0;
             let totalFootprintKg = 0;
