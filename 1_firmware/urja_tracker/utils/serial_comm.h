@@ -1,7 +1,7 @@
 #ifndef SERIAL_COMM_H
 #define SERIAL_COMM_H
 
-#include "config.h" // <-- CORRECTED: Removed "../"
+#include "../config.h" // <-- CORRECTED: Added "../" back
 #include <ArduinoJson.h> 
 
 struct ClassroomState {
