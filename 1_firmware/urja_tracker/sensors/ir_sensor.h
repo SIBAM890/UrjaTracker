@@ -1,8 +1,7 @@
-// IR sensor header 
 #ifndef IR_SENSOR_H
 #define IR_SENSOR_H
 
-#include "config.h"
+#include "config.h" // <-- CORRECTED: Removed "../"
 
 void setup_ir_sensor() {
   pinMode(PIN_SENSOR_PIR, INPUT);

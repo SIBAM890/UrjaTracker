@@ -1,11 +1,9 @@
-// Serial communication helper 
 #ifndef SERIAL_COMM_H
 #define SERIAL_COMM_H
 
-#include "config.h"
-#include <ArduinoJson.h> // ArduinoJson Library
+#include "config.h" // <-- CORRECTED: Removed "../"
+#include <ArduinoJson.h> 
 
-// This struct holds the complete state of the classroom
 struct ClassroomState {
   bool person_present;
   int ldr_level;
@@ -16,7 +14,6 @@ struct ClassroomState {
   bool fan_on;
 };
 
-// Sends the complete state as a single JSON line over Serial
 void send_serial_data(ClassroomState &state) {
   StaticJsonDocument<JSON_DOC_SIZE> doc;
 
@@ -28,9 +25,8 @@ void send_serial_data(ClassroomState &state) {
   doc["light_state"] = state.light_on ? "ON" : "OFF";
   doc["fan_state"] = state.fan_on ? "ON" : "OFF";
 
-  // Print the JSON to the Serial port
   serializeJson(doc, Serial);
-  Serial.println(); // Send a newline to mark the end of the message
+  Serial.println(); 
 }
 
 #endif

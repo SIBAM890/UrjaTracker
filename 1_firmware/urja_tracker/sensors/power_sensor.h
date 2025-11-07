@@ -1,11 +1,9 @@
-// Power sensor header 
 #ifndef POWER_SENSOR_H
 #define POWER_SENSOR_H
 
-#include "config.h"
+#include "config.h" // <-- CORRECTED: Removed "../"
 
 // Returns: Estimated power in Watts (W)
-// Note: This is a simplified calculation for AC, good for a prototype.
 double read_power_watts() {
   int sensor_value = analogRead(PIN_SENSOR_POWER);
   
@@ -15,7 +13,7 @@ double read_power_watts() {
   // Convert voltage to Amps (Absolute value)
   double current_amps = abs((voltage_mv - 2500.0) / ACS_MV_PER_AMP);
   
-  // P = V * I. Assume V = 230V (Standard for India)
+  // P = V * I. Assume V = 230V
   const double MAINS_VOLTAGE = 230.0; 
   return MAINS_VOLTAGE * current_amps;
 }

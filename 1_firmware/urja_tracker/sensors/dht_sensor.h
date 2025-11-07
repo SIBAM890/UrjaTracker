@@ -2,7 +2,8 @@
 #ifndef DHT_SENSOR_H
 #define DHT_SENSOR_H
 
-#include "config.h"
+#include "config.h" // <-- CORRECTED: Removed the "../"
+
 #include <DHT.h> // Adafruit DHT Library
 
 DHT dht(PIN_SENSOR_DHT, DHT_TYPE);
@@ -23,7 +24,7 @@ DhtReadings read_dht_data() {
   readings.temperature = dht.readTemperature(); // Celsius
 
   if (isnan(readings.humidity) || isnan(readings.temperature)) {
-    Serial.println("Error: Failed to read from DHT sensor!");
+    // Serial.println("Error: Failed to read from DHT sensor!"); // <-- CORRECTED: Commented out to prevent JSON errors
     readings.read_success = false;
   } else {
     readings.read_success = true;
